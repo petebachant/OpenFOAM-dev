@@ -7,8 +7,8 @@ language: cpp
 
 before_install:
     - sudo apt-get install -qq git-core build-essential binutils-dev cmake flex bison zlib1g-dev qt4-dev-tools libqt4-dev libqtwebkit-dev gnuplot libreadline-dev libncurses-dev libxt-dev libopenmpi-dev openmpi-bin libboost-system-dev libboost-thread-dev libgmp-dev libmpfr-dev python python-dev
-    - mkdir OpenFOAM
-    - cd OpenFOAM
+    - mkdir ~/OpenFOAM
+    - cd ~/OpenFOAM
     - git clone https://github.com/OpenFOAM/ThirdParty-dev.git
     - cd ThirdParty-dev
     - mkdir download
