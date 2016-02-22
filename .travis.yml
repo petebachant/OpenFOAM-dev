@@ -1,0 +1,37 @@
+# Travis CI setup for OpenFOAM-dev adapted from
+# https://openfoamwiki.net/index.php/Installation/Linux/OpenFOAM-dev/Ubuntu#Ubuntu_14.04
+
+sudo: required
+dist: trusty
+language: cpp
+
+before_install:
+    - sudo apt-get install -qq git-core build-essential binutils-dev cmake flex bison zlib1g-dev qt4-dev-tools libqt4-dev libqtwebkit-dev gnuplot libreadline-dev libncurses-dev libxt-dev libopenmpi-dev openmpi-bin libboost-system-dev libboost-thread-dev libgmp-dev libmpfr-dev python python-dev
+    - mkdir OpenFOAM
+    - cd OpenFOAM
+    - git clone https://github.com/OpenFOAM/ThirdParty-dev.git
+    - cd ThirdParty-dev
+    - mkdir download
+    - wget -P download https://gforge.inria.fr/frs/download.php/file/34099/scotch_6.0.3.tar.gz
+    - wget -P download https://github.com/CGAL/cgal/releases/download/releases%2FCGAL-4.7/CGAL-4.7.tar.xz
+    - tar -xzf download/scotch_6.0.3.tar.gz
+    - tar -xJf download/CGAL-4.7.tar.xz
+
+install:
+    # Move this repo into the correct directory
+    - cd ../
+    - mv OpenFOAM-dev ~/OpenFOAM
+    - source $HOME/OpenFOAM/OpenFOAM-dev/etc/bashrc
+    - cd $WM_THIRD_PARTY_DIR
+    - export QT_SELECT=qt4
+    - ./Allwmake
+    - wmSET $FOAM_SETTINGS
+    - cd $WM_PROJECT_DIR
+    - ./Allwmake -j 2
+
+before_script:
+    - source $HOME/OpenFOAM/OpenFOAM-dev/etc/bashrc
+
+script:
+    - cd $FOAM_TUTORIALS
+    - ./Alltest
