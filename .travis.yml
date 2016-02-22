@@ -22,6 +22,8 @@ install:
     - echo $PWD
     - cd ~
     - ls .
+    - ls build
+    - ls builds
     - mv OpenFOAM-dev ~/OpenFOAM
     - source $HOME/OpenFOAM/OpenFOAM-dev/etc/bashrc
     - cd $WM_THIRD_PARTY_DIR
