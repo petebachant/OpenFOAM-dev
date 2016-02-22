@@ -5,6 +5,11 @@ sudo: required
 dist: trusty
 language: cpp
 
+env:
+  global:
+    - REPO="petebachant/OpenFOAM-dev"
+    - CI_HOME=`pwd`/$REPO
+
 before_install:
     - sudo apt-get install -qq git-core build-essential binutils-dev cmake flex bison zlib1g-dev qt4-dev-tools libqt4-dev libqtwebkit-dev gnuplot libreadline-dev libncurses-dev libxt-dev libopenmpi-dev openmpi-bin libboost-system-dev libboost-thread-dev libgmp-dev libmpfr-dev python python-dev
     - mkdir ~/OpenFOAM
@@ -19,12 +24,7 @@ before_install:
 
 install:
     # Move this repo into the correct directory
-    - echo $PWD
-    - cd ~
-    - ls .
-    - ls build
-    - ls builds
-    - mv OpenFOAM-dev ~/OpenFOAM
+    - mv $CI_HOME ~/OpenFOAM
     - source $HOME/OpenFOAM/OpenFOAM-dev/etc/bashrc
     - cd $WM_THIRD_PARTY_DIR
     - export QT_SELECT=qt4
