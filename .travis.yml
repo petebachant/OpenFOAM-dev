@@ -20,7 +20,8 @@ before_install:
 install:
     # Move this repo into the correct directory
     - echo $PWD
-    - cd ../
+    - cd ~
+    - ls .
     - mv OpenFOAM-dev ~/OpenFOAM
     - source $HOME/OpenFOAM/OpenFOAM-dev/etc/bashrc
     - cd $WM_THIRD_PARTY_DIR
