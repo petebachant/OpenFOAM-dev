@@ -7,8 +7,7 @@ language: cpp
 
 env:
   global:
-    - REPO="petebachant/OpenFOAM-dev"
-    - CI_HOME=`pwd`/$REPO
+    - REPO_DIR=$PWD
 
 before_install:
     - sudo apt-get install -qq git-core build-essential binutils-dev cmake flex bison zlib1g-dev qt4-dev-tools libqt4-dev libqtwebkit-dev gnuplot libreadline-dev libncurses-dev libxt-dev libopenmpi-dev openmpi-bin libboost-system-dev libboost-thread-dev libgmp-dev libmpfr-dev python python-dev
@@ -24,7 +23,7 @@ before_install:
 
 install:
     # Move this repo into the correct directory
-    - mv $CI_HOME ~/OpenFOAM
+    - mv $REPO_DIR ~/OpenFOAM
     - source $HOME/OpenFOAM/OpenFOAM-dev/etc/bashrc
     - cd $WM_THIRD_PARTY_DIR
     - export QT_SELECT=qt4
