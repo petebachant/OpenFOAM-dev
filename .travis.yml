@@ -28,7 +28,6 @@ install:
     - cd $WM_THIRD_PARTY_DIR
     - export QT_SELECT=qt4
     - ./Allwmake
-    - wmSET $FOAM_SETTINGS
     - cd $WM_PROJECT_DIR
     - ./Allwmake -j 2
 
