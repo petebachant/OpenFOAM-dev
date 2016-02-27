@@ -42,7 +42,11 @@ install:
     - Pstream/Allwmake $targetType $*
     - OSspecific/${WM_OSTYPE:-POSIX}/Allwmake $*
     - wmake $targetType OpenFOAM
-    # - ./Allwmake -j 2
+    - wmake $targetType fileFormats
+    - wmake $targetType surfMesh
+    - wmake $targetType triSurface
+    - wmake $targetType meshTools
+    - wmake $targetType edgeMesh
 
 before_script:
     - source $HOME/OpenFOAM/OpenFOAM-dev/etc/bashrc
