@@ -8,6 +8,7 @@ language: cpp
 env:
   global:
     - REPO_DIR=$PWD
+    - targetType=libso
 
 before_install:
     - sudo apt-get install -qq git-core build-essential binutils-dev cmake flex bison zlib1g-dev qt4-dev-tools libqt4-dev libqtwebkit-dev gnuplot libreadline-dev libncurses-dev libxt-dev libopenmpi-dev openmpi-bin libboost-system-dev libboost-thread-dev libgmp-dev libmpfr-dev python python-dev
@@ -29,7 +30,19 @@ install:
     - export QT_SELECT=qt4
     - ./Allwmake
     - cd $WM_PROJECT_DIR
-    - ./Allwmake -j 2
+    # Compile wmake support applications
+    - (cd wmake/src && make)
+    # Move into src dir
+    - cd $WM_PROJECT_DIR/src
+    # Update OpenFOAM version strings if required
+    - wmakePrintBuild -check || /bin/rm -f OpenFOAM/Make/*/global.? 2>/dev/null
+    # Start building libraries
+    - wmakeLnInclude OpenFOAM
+    - wmakeLnInclude OSspecific/${WM_OSTYPE:-POSIX}
+    - Pstream/Allwmake $targetType $*
+    - OSspecific/${WM_OSTYPE:-POSIX}/Allwmake $*
+    - wmake $targetType OpenFOAM
+    # - ./Allwmake -j 2
 
 before_script:
     - source $HOME/OpenFOAM/OpenFOAM-dev/etc/bashrc
