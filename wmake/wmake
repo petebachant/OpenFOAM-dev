@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #------------------------------------------------------------------------------
 # =========                 |
 # \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
@@ -49,7 +49,7 @@
 #         wdep -h
 #
 # See also
-#     wmakeLnInclude, wmakeLnIncludeAll, wmakeQueue, wdep, wrmdep, wrmo,
+#     wmakeLnInclude, wmakeLnIncludeAll, wmakeCollect, wdep, wrmdep, wrmo,
 #     wclean, wcleanPlatform, wcleanLnIncludeAll
 #
 #------------------------------------------------------------------------------
@@ -67,9 +67,9 @@ Usage: $Script [OPTION] [dir]
        $Script [OPTION] target [dir [MakeDir]]
 
 options:
-  -s | -silent      'silent' mode (does not echo commands)
+  -s | -silent      Quiet mode (does not echo commands)
   -a | -all         wmake all sub-directories, running Allwmake if present
-  -q | -queue       wmakeQueue all sub-directories, running Allwmake if present
+  -q | -queue       wmakeCollect all sub-directories, running Allwmake if present
   -k or -non-stop   Compile without stopping when errors occur
   -j                Compile using all local cores/hyperthreads
   -jN or -j N       Compile using N cores/hyperthreads
@@ -87,7 +87,7 @@ The 'target' is a Makefile target:
 
 or a special target:
   all               wmake all sub-directories, running Allwmake if present
-  queue             wmakeQueue all sub-directories, running Allwmake if present
+  queue             wmakeCollect all sub-directories, running Allwmake if present
   exe               Compile statically linked executable
   lib               Compile statically linked archive lib (.a)
   libo              Compile statically linked lib (.o)
@@ -138,7 +138,7 @@ do
             usage
             ;;
         -s | -silent)
-            make="$make -s"
+            export WM_QUIET=1
             ;;
         -a | -all | all)
             all="all"
@@ -268,6 +268,10 @@ then
             exit 1
         }
     fi
+
+    # Print command
+    [ -z "$targetType" ] || targetSpace=" "
+    echo "$Script $targetType$targetSpace${dir:-.}"
 fi
 
 
@@ -328,20 +332,20 @@ fi
 
 
 #------------------------------------------------------------------------------
-# Recurse the source tree to compile "all" targets using wmakeQueue
+# Recurse the source tree to compile "all" targets using wmakeCollect
 #------------------------------------------------------------------------------
 
 if [ "$all" = "queue" ]
 then
     [ -n "$update" ] || wmakeLnIncludeAll $parOpt
 
-    (                                                                          \
-        WM_COLLECT_DIR=$WM_PROJECT_DIR/platforms/${WM_OPTIONS}/${PWD////_}     \
-        WM_SCHEDULER=wmakeCollect                                              \
-        trap '$WM_SCHEDULER -kill' TERM INT;                                   \
+    (
+        export WM_COLLECT_DIR=$WM_PROJECT_DIR/platforms/${WM_OPTIONS}/${PWD////_}
+        export WM_SCHEDULER=wmakeCollect
+        trap '$WM_SCHEDULER -kill' TERM INT
         $WM_SCHEDULER -clean                                                   \
      && wmake -all objects                                                     \
-     && $WM_SCHEDULER                                                          \
+     && $WM_SCHEDULER
     ) && wmake -all
     exit $?
 fi
@@ -349,7 +353,7 @@ fi
 
 #------------------------------------------------------------------------------
 # Search up the directory tree for the Make sub-directory,
-# check the existance of the 'files' file and build there if present
+# check the existence of the 'files' file and build there if present
 #------------------------------------------------------------------------------
 
 cdSource
@@ -386,7 +390,7 @@ fi
 #------------------------------------------------------------------------------
 
 objectsDir=$MakeDir/$WM_OPTIONS
-if echo $PWD | grep "$WM_PROJECT_DIR"
+if [ $(echo $PWD | grep "$WM_PROJECT_DIR") ]
 then
     platformPath=$WM_PROJECT_DIR/platforms/${WM_OPTIONS}
     objectsDir=$platformPath$(echo $PWD | sed s%$WM_PROJECT_DIR%% )

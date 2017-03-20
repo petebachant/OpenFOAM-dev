@@ -43,7 +43,7 @@ namespace Foam
 }
 
 
-// * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
+// * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
 
 void Foam::GAMGAgglomeration::compactLevels(const label nCreatedLevels)
 {
@@ -206,13 +206,20 @@ void Foam::GAMGAgglomeration::compactLevels(const label nCreatedLevels)
 
 bool Foam::GAMGAgglomeration::continueAgglomerating
 (
+    const label nFineCells,
     const label nCoarseCells
 ) const
 {
-    // Check the need for further agglomeration on all processors
-    bool contAgg = nCoarseCells >= nCellsInCoarsestLevel_;
-    mesh().reduce(contAgg, andOp<bool>());
-    return contAgg;
+    const label nTotalCoarseCells = returnReduce(nCoarseCells, sumOp<label>());
+    if (nTotalCoarseCells < Pstream::nProcs()*nCellsInCoarsestLevel_)
+    {
+        return false;
+    }
+    else
+    {
+        const label nTotalFineCells = returnReduce(nFineCells, sumOp<label>());
+        return nTotalCoarseCells < nTotalFineCells;
+    }
 }
 
 

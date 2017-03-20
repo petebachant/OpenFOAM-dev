@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2017 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -48,17 +48,19 @@ const char*
 Foam::NamedEnum
 <
     Foam::functionObjects::fieldValues::volFieldValue::operationType,
-    11
+    13
 >::names[] =
 {
     "none",
     "sum",
+    "weightedSum",
     "sumMag",
     "average",
     "weightedAverage",
     "volAverage",
     "weightedVolAverage",
     "volIntegrate",
+    "weightedVolIntegrate",
     "min",
     "max",
     "CoV"
@@ -67,7 +69,7 @@ Foam::NamedEnum
 const Foam::NamedEnum
 <
     Foam::functionObjects::fieldValues::volFieldValue::operationType,
-    11
+    13
 > Foam::functionObjects::fieldValues::volFieldValue::operationTypeNames_;
 
 
@@ -96,11 +98,11 @@ void Foam::functionObjects::fieldValues::volFieldValue::writeFileHeader
 
     writeCommented(file(), "Time");
 
-    forAll(fields_, i)
+    forAll(fields_, fieldi)
     {
         file()
             << tab << operationTypeNames_[operation_]
-            << "(" << fields_[i] << ")";
+            << "(" << fields_[fieldi] << ")";
     }
 
     file() << endl;

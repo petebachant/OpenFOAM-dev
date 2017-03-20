@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2017 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -33,7 +33,7 @@ License
 namespace Foam
 {
 
-// * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
+// * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * * //
 
 template<class TurbulenceModel, class BasicTurbulenceModel>
 tmp<volScalarField>
@@ -388,7 +388,7 @@ kOmegaSST<TurbulenceModel, BasicTurbulenceModel>::kOmegaSST
 template<class TurbulenceModel, class BasicTurbulenceModel>
 bool kOmegaSST<TurbulenceModel, BasicTurbulenceModel>::read()
 {
-    if (BasicTurbulenceModel::read())
+    if (TurbulenceModel::read())
     {
         alphaK1_.readIfPresent(this->coeffDict());
         alphaK2_.readIfPresent(this->coeffDict());

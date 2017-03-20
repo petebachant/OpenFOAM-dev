@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2017 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -28,7 +28,7 @@ Group
     grpFieldFunctionObjects
 
 Description
-    Calculates the value and location of scalar minimim and maximum for a list
+    Calculates the value and location of scalar minimum and maximum for a list
     of user-specified fields.
 
     For variables with a rank greater than zero, either the min/max of a
@@ -123,7 +123,7 @@ protected:
         wordList fieldSet_;
 
 
-    // Private Member Functions
+    // Protected Member Functions
 
         //- Helper function to write the output
         template<class Type>
@@ -131,6 +131,8 @@ protected:
         (
             const word& fieldName,
             const word& outputName,
+            const label minCell,
+            const label maxCell,
             const vector& minC,
             const vector& maxC,
             const label minProci,

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2017 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -34,11 +34,10 @@ Foam::Function1Types::TableFile<Type>::TableFile
     const dictionary& dict
 )
 :
-    TableBase<Type>(entryName, dict.subDict(entryName + "Coeffs")),
+    TableBase<Type>(entryName, dict),
     fName_("none")
 {
-    const dictionary coeffs(dict.subDict(entryName + "Coeffs"));
-    coeffs.lookup("fileName") >> fName_;
+    dict.lookup("file") >> fName_;
 
     fileName expandedFile(fName_);
     IFstream is(expandedFile.expand());
@@ -87,7 +86,7 @@ void Foam::Function1Types::TableFile<Type>::writeData(Ostream& os) const
     // the values themselves
     TableBase<Type>::writeEntries(os);
 
-    os.writeKeyword("fileName")<< fName_ << token::END_STATEMENT << nl;
+    os.writeKeyword("file")<< fName_ << token::END_STATEMENT << nl;
     os  << decrIndent << indent << token::END_BLOCK << endl;
 }
 

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2017 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -427,24 +427,7 @@ bool Foam::functionObjects::wallBoundedStreamLine::read(const dictionary& dict)
     Info<< type() << " " << name() << ":" << nl;
 
     dict.lookup("fields") >> fields_;
-    if (dict.found("U"))
-    {
-        dict.lookup("U") >> UName_;
-    }
-    else
-    {
-        UName_ = "U";
-        if (dict.found("U"))
-        {
-            IOWarningInFunction
-            (
-                dict
-            )   << "Using deprecated entry \"U\"."
-                << " Please use \"UName\" instead."
-                << endl;
-            dict.lookup("U") >> UName_;
-        }
-    }
+    dict.lookup("U") >> UName_;
 
     if (findIndex(fields_, UName_) == -1)
     {
@@ -633,7 +616,7 @@ bool Foam::functionObjects::wallBoundedStreamLine::write()
         allTracks_.shrink();
         mapDistributeBase::distribute
         (
-            Pstream::scheduled,
+            Pstream::commsTypes::scheduled,
             distMap.schedule(),
             distMap.constructSize(),
             distMap.subMap(),
@@ -650,7 +633,7 @@ bool Foam::functionObjects::wallBoundedStreamLine::write()
             allScalars_[scalarI].shrink();
             mapDistributeBase::distribute
             (
-                Pstream::scheduled,
+                Pstream::commsTypes::scheduled,
                 distMap.schedule(),
                 distMap.constructSize(),
                 distMap.subMap(),
@@ -668,7 +651,7 @@ bool Foam::functionObjects::wallBoundedStreamLine::write()
             allVectors_[vectorI].shrink();
             mapDistributeBase::distribute
             (
-                Pstream::scheduled,
+                Pstream::commsTypes::scheduled,
                 distMap.schedule(),
                 distMap.constructSize(),
                 distMap.subMap(),

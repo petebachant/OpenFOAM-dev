@@ -121,7 +121,8 @@ Foam::functionObjects::yPlus::yPlus
 )
 :
     fvMeshFunctionObject(name, runTime, dict),
-    logFiles(obr_, name)
+    logFiles(obr_, name),
+    writeLocalObjects(obr_, log)
 {
     volScalarField* yPlusPtr
     (
@@ -133,7 +134,7 @@ Foam::functionObjects::yPlus::yPlus
                 mesh_.time().timeName(),
                 mesh_,
                 IOobject::NO_READ,
-                IOobject::AUTO_WRITE
+                IOobject::NO_WRITE
             ),
             mesh_,
             dimensionedScalar("0", dimless, 0.0)
@@ -142,7 +143,9 @@ Foam::functionObjects::yPlus::yPlus
 
     mesh_.objectRegistry::store(yPlusPtr);
 
+    read(dict);
     resetName(typeName);
+    resetLocalObjectName(typeName);
 }
 
 
@@ -157,6 +160,7 @@ Foam::functionObjects::yPlus::~yPlus()
 bool Foam::functionObjects::yPlus::read(const dictionary& dict)
 {
     fvMeshFunctionObject::read(dict);
+    writeLocalObjects::read(dict);
 
     return true;
 }
@@ -192,15 +196,14 @@ bool Foam::functionObjects::yPlus::execute()
 
 bool Foam::functionObjects::yPlus::write()
 {
-    const volScalarField& yPlus =
-        obr_.lookupObject<volScalarField>(type());
+    Log << type() << " " << name() << " write:" << nl;
 
-    Log << type() << " " << name() << " write:" << nl
-        << "    writing field " << yPlus.name() << endl;
-
-    yPlus.write();
+    writeLocalObjects::write();
 
     logFiles::write();
+
+    const volScalarField& yPlus =
+        mesh_.lookupObject<volScalarField>(type());
 
     const volScalarField::Boundary& yPlusBf = yPlus.boundaryField();
     const fvPatchList& patches = mesh_.boundary();
@@ -233,6 +236,8 @@ bool Foam::functionObjects::yPlus::write()
             }
         }
     }
+
+    Log << endl;
 
     return true;
 }

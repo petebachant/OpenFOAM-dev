@@ -42,9 +42,11 @@ Description
 
     It also has the ability to write the selected objects that were defined
     with the respective write mode for the requested \c writeOption, namely:
-      - \c autoWrite - objects set to write at output time
-      - \c noWrite   - objects set to not write by default
-      - \c anyWrite  - any option of the previous two
+    \vartable
+        autoWrite | objects set to write at output time
+        noWrite   | objects set to not write by default
+        anyWrite  | any option of the previous two
+    \endvartable
 
     Example of function object specification:
     \verbatim
@@ -60,16 +62,17 @@ Description
 
 Usage
     \table
-        Property     | Description             | Required    | Default value
-        type         | type name: writeObjects | yes         |
-        objects      | objects to write        | yes         |
-        writeOption  | only those with this write option | no   | any
+        Property     | Description             | Required     | Default value
+        type         | type name: writeObjects | yes          |
+        objects      | objects to write        | yes          |
+        writeOption  | only those with this write option | no | anyWrite
     \endtable
 
     Note: Regular expressions can also be used in \c objects.
 
 See also
     Foam::functionObject
+    Foam::functionObjects::writeObjectsBase
     Foam::functionObjects::timeControl
 
 SourceFiles
@@ -81,16 +84,13 @@ SourceFiles
 #define functionObjects_writeObjects_H
 
 #include "functionObject.H"
-#include "wordReList.H"
+#include "writeObjectsBase.H"
 #include "NamedEnum.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
-
-// Forward declaration of classes
-class objectRegistry;
 
 namespace functionObjects
 {
@@ -101,7 +101,8 @@ namespace functionObjects
 
 class writeObjects
 :
-    public functionObject
+    public functionObject,
+    public writeObjectsBase
 {
 public:
 
@@ -116,23 +117,20 @@ public:
             ANY_WRITE
         };
 
-        static const NamedEnum<writeOption, 3> writeOptionNames;
+        static const NamedEnum<writeOption, 3> writeOptionNames_;
 
 private:
 
     // Private data
 
-        //- Reference to Db
-        const objectRegistry& obr_;
-
-        //- Takes over the writing from Db
+        //- To only write objects of defined writeOption
         writeOption writeOption_;
-
-        //- Names of objects to control
-        wordReList objectNames_;
 
 
     // Private Member Functions
+
+        //- Write the requested registered IO object
+        virtual void writeObject(const regIOobject& obj);
 
         //- Disallow default bitwise copy construct
         writeObjects(const writeObjects&);
