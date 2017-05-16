@@ -41,7 +41,8 @@ def test_single(test_dir, autopar=True):
     try:
         compile_out = subprocess.check_output("wmake", stderr=STDOUT).decode()
         test_compiled = True
-    except subprocess.CalledProcessError:
+    except subprocess.CalledProcessError as e:
+        compile_out += e.output.decode()
         test_compiled = False
     if test_compiled:
         test_exe = get_test_exe_name(test_dir)
@@ -51,7 +52,8 @@ def test_single(test_dir, autopar=True):
             run_out = subprocess.check_output(test_exe, stderr=STDOUT,
                                               shell=True).decode()
             test_ran = True
-        except subprocess.CalledProcessError:
+        except subprocess.CalledProcessError as e:
+            run_out += e.output.decode()
             test_ran = False
     else:
         test_ran = False
@@ -71,38 +73,58 @@ def test_multiple(test_dirs="all", verbose=False):
     """Run multiple tests."""
     if test_dirs == "all":
         test_dirs = collect_test_dirs()
-    print("Collected {} tests\n".format(len(test_dirs)))
+    print("\nRunning OpenFOAM unit tests")
+    print("\nCollected {} tests\n".format(len(test_dirs)))
     status_str = ""
     errored = []
     passed = []
     failed = []
+    err_out = ""
+    fail_out = ""
+    std_out = ""
     for test_dir in test_dirs:
         if verbose:
-            print("Testing", test_dir)
+            print("Testing {:24s}".format(test_dir + "..."), end="", sep=" ")
         c, p, cout, rout = test_single(test_dir)
         if not c:
             if verbose:
                 print("ERROR")
             errored.append(test_dir)
             status_str += "E"
+            err_out += cout
         elif not p:
             if verbose:
                 print("FAIL")
             failed.append(test_dir)
             status_str += "F"
-        else:
+            fail_out += rout
+        elif c and p:
             if verbose:
                 print("PASS")
             passed.append(test_dir)
             status_str += "."
-        print(status_str, end="")
+            std_out += rout
+        if not verbose:
+            print(status_str, end="", flush=True)
+    print("\n")
+    # Now print a summary
+    print("Passed: {}/{}".format(len(passed), len(test_dirs)))
+    if errored:
+        print("Errored: {}/{}:".format(len(errored), len(test_dirs)), errored)
+        print("\n====== COMPILATION ERRORS ======\n")
+        print(err_out)
+    if failed:
+        print("Failed: {}/{}:".format(len(failed), len(test_dirs)), failed)
+        print("\n====== RUN ERRORS ======\n")
+        print(fail_out)
+    print()
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run OpenFOAM unit tests")
-    parser.add_argument("--tests", "-t", help="Which tests to run or clean",
+    parser.add_argument("--tests", "-n", help="Which tests to run or clean",
                         default="all", choices=collect_test_dirs() + ["all"],
-                        metavar="tests")
+                        metavar="tests", nargs="+")
     parser.add_argument("--clean", "-c", action="store_true", default=False,
                         help="Clean all unit test executables")
     parser.add_argument("--verbose", "-v", action="store_true", default=False,
@@ -111,4 +133,4 @@ if __name__ == "__main__":
     if args.clean:
         clean_all(args.tests)
     else:
-        test_multiple(args.tests)
+        test_multiple(args.tests, verbose=args.verbose)
