@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """Automatically collect and run unit tests."""
 
 from __future__ import division, print_function
