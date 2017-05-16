@@ -75,7 +75,6 @@ def test_multiple(test_dirs="all", verbose=False):
         test_dirs = collect_test_dirs()
     print("\nRunning OpenFOAM unit tests")
     print("\nCollected {} tests\n".format(len(test_dirs)))
-    status_str = ""
     errored = []
     passed = []
     failed = []
@@ -90,19 +89,19 @@ def test_multiple(test_dirs="all", verbose=False):
             if verbose:
                 print("ERROR")
             errored.append(test_dir)
-            status_str += "E"
+            status_str = "E"
             err_out += cout
         elif not p:
             if verbose:
                 print("FAIL")
             failed.append(test_dir)
-            status_str += "F"
+            status_str = "F"
             fail_out += rout
         elif c and p:
             if verbose:
                 print("PASS")
             passed.append(test_dir)
-            status_str += "."
+            status_str = "."
             std_out += rout
         if not verbose:
             print(status_str, end="", flush=True)
@@ -112,11 +111,11 @@ def test_multiple(test_dirs="all", verbose=False):
     if errored:
         print("Errored: {}/{}:".format(len(errored), len(test_dirs)), errored)
         print("\n====== COMPILATION ERRORS ======\n")
-        print(err_out)
+        raise RuntimeError(err_out)
     if failed:
         print("Failed: {}/{}:".format(len(failed), len(test_dirs)), failed)
         print("\n====== RUN ERRORS ======\n")
-        print(fail_out)
+        raise RuntimeError(fail_out)
     print()
 
 
