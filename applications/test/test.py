@@ -69,7 +69,7 @@ def clean(test_dirs="all"):
         subprocess.call(["wclean", d])
 
 
-def test_multiple(test_dirs="all", verbose=False):
+def test_multiple(test_dirs="all", exit_on_first=False, verbose=False):
     """Run multiple tests."""
     if test_dirs == "all":
         test_dirs = collect_test_dirs()
@@ -105,6 +105,8 @@ def test_multiple(test_dirs="all", verbose=False):
             std_out += rout
         if not verbose:
             print(status_str, end="", flush=True)
+        if exit_on_first and (not c or not p):
+            break
     print("\n")
     # Now print a summary
     print("Passed: {}/{}".format(len(passed), len(test_dirs)))
@@ -126,10 +128,13 @@ if __name__ == "__main__":
                         metavar="tests", nargs="+")
     parser.add_argument("--clean", "-c", action="store_true", default=False,
                         help="Clean all unit test executables")
+    parser.add_argument("--existfirst", "-x", action="store_true",
+                        default=False, help="Exit on first failure")
     parser.add_argument("--verbose", "-v", action="store_true", default=False,
                         help="Print verbose output")
     args = parser.parse_args()
     if args.clean:
         clean_all(args.tests)
     else:
-        test_multiple(args.tests, verbose=args.verbose)
+        test_multiple(args.tests, exit_on_first=args.existfirst,
+                      verbose=args.verbose)
